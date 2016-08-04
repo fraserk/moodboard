@@ -17,8 +17,6 @@ class MoodboardController extends Controller
      */
     public function index()
     {
-        $data = request()->user()->moodboard::all();
-        dd($data);
     }
 
     /**
