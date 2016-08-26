@@ -36,8 +36,12 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request,  Moodboard $moodboard, Category $category)
     {
+        $settings =  json_encode(
+        $request->all()
+      );
+        return  Moodboard::find($moodboard)->categories()->updateExistingPivot($category, ['settings'=> $settings]);
     }
 
     /**
@@ -46,12 +50,15 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user, Moodboard $moodboard, Category $category)
+    public function show(Request $request, User $user, Moodboard $moodboard, Category $category)
     {
-        $data = $moodboard->categories()->where('category_id', $category->id)->first()->pivot->settings;
-        $settings = json_decode($data);
-        //dd($settings);
-        return view('category.show', compact('moodboard', 'category', 'settings'));
+        $data = $moodboard->categories()->where('category_id', $request->category->id)->first()->pivot->settings;
+        $settings =  $data;
+        if ($request->ajax()) {
+            return $settings;
+        }
+        //dd();
+        return view('category.show', compact('moodboard', 'category'));
     }
 
     /**
@@ -74,13 +81,13 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
-        $moodboard = Moodboard::find(request()->moodboard)->categories()->where('category_id', request()->category)->first();
         //dd($moodboard->pivot);
-        $settings =  json_encode([
-          request()->only('detail')
-        ]);
-        Moodboard::find(request()->moodboard)->categories()->updateExistingPivot(request()->category, ['settings'=> $settings]);
-        return redirect()->route('user.moodboard.category.show', [auth()->user(), request()->moodboard, request()->category]);
+        $settings =  json_encode(
+          request()->all()
+        );
+
+        return Moodboard::find($request->moodboard)->categories()->updateExistingPivot($request->category, ['settings'=> $settings]);
+        //return redirect()->route('user.moodboard.category.show', [auth()->user(), request()->moodboard, request()->category]);
     }
 
     /**

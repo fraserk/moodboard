@@ -20,3 +20,19 @@ Route::auth();
 Route::resource('user.moodboard', 'MoodboardController');
 Route::resource('user.moodboard.category', 'CategoryController');
 Route::get('/home', 'HomeController@index');
+Route::post('/palette', function () {
+  //dd(request()->all());
+  $settings =  json_encode(
+    request()->all()
+  );
+  return  Moodboard::find('17')->categories()->updateExistingPivot('1', ['settings'=> $settings]);
+
+});
+
+Route::get('/palette', function () {
+  //dd(request()->all());
+  $data = Moodboard::find('17')->categories()->where('category_id', '1')->first()->pivot->settings;
+  $settings =  $data;
+  return  $settings;
+
+});
