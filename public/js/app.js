@@ -11624,7 +11624,7 @@ Vue.component('ColorPalette', {
     getEmptyColorSection: function getEmptyColorSection() {
       return {
         sectionsName: 'Default Color',
-        showEditForm: false,
+        edit: false,
         child: [] };
     },
     getEmptyColor: function getEmptyColor() {
@@ -11639,9 +11639,22 @@ Vue.component('ColorPalette', {
     doneDetail: function doneDetail() {
       this.showEditDetail = false;
     },
-    editSectionName: function editSectionName(name) {
-      // name.showEditForm = true;
+    toggleEdit: function toggleEdit(name) {
+      name.edit = !name.edit;
+
+      // Focus input field
+      if (name.edit) {
+        var ev = this;
+        Vue.nextTick(function () {
+          ev.$$.name.colorSection.focus();
+        });
+      }
     },
+    saveEdit: function saveEdit(name) {
+      //save your changes
+      this.toggleEdit(name);
+    },
+
     addEmptyColorSection: function addEmptyColorSection() {
       this.palette.color.push(this.getEmptyColorSection());
     },
