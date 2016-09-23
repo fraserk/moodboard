@@ -11599,7 +11599,7 @@ new Vue({
   el: '#app-layout'
 });
 
-},{"./components/bootstrap":6,"Vue":1,"vue-resource":3}],5:[function(require,module,exports){
+},{"./components/bootstrap":7,"Vue":1,"vue-resource":3}],5:[function(require,module,exports){
 'use strict';
 
 Vue.component('ColorPalette', {
@@ -11609,8 +11609,9 @@ Vue.component('ColorPalette', {
       user: '',
       moodboard: '',
       category: '',
+      showEditDetail: false,
+      detail: 'test',
       palette: {
-        detail: '',
         color: []
       }
     };
@@ -11623,7 +11624,7 @@ Vue.component('ColorPalette', {
     getEmptyColorSection: function getEmptyColorSection() {
       return {
         sectionsName: 'Default Color',
-
+        showEditForm: false,
         child: [] };
     },
     getEmptyColor: function getEmptyColor() {
@@ -11632,7 +11633,15 @@ Vue.component('ColorPalette', {
         name: '#000';
       }
     },
-
+    editDetail: function editDetail() {
+      this.showEditDetail = true;
+    },
+    doneDetail: function doneDetail() {
+      this.showEditDetail = false;
+    },
+    editSectionName: function editSectionName(name) {
+      // name.showEditForm = true;
+    },
     addEmptyColorSection: function addEmptyColorSection() {
       this.palette.color.push(this.getEmptyColorSection());
     },
@@ -11664,8 +11673,89 @@ Vue.component('ColorPalette', {
 },{}],6:[function(require,module,exports){
 'use strict';
 
-require('./ColorPalette');
+Vue.component('Typography', {
+  props: ['types'],
+  data: function data() {
+    return {
+      googleFonts: [],
+      font: '',
+      selectedfont: [],
+      user: '',
+      moodboard: '',
+      category: 'test',
+      type: {
+        detail: '',
+        color: []
+      }
+    };
+  },
+  ready: function ready() {
+    this.getGoogleFfonts();
+  },
 
-},{"./ColorPalette":5}]},{},[4]);
+  methods: {
+    getEmptyColorSection: function getEmptyColorSection() {
+      return {
+        sectionsName: 'Default Color',
+
+        child: [] };
+    },
+    getEmptyColor: function getEmptyColor() {
+      return;
+      {
+        name: '#000';
+      }
+    },
+    loadfont: function loadfont(font) {
+      //  console.log(font);
+      this.selectedfont.push(font);
+    },
+    getGoogleFfonts: function getGoogleFfonts() {
+      var _this = this;
+
+      this.$http.get('https://www.googleapis.com/webfonts/v1/webfonts?fields=items%2Ffamily&key=AIzaSyBzVRj-TIf1bdKYLfyU9-QcsL6coWRDY5s').then(function (response) {
+        //  console.log(response['data']['items']);
+        _this.$set('googleFonts', response['data']['items']);
+      }, function (response) {
+        concole.log(response);
+      });
+    },
+
+    addEmptyColorSection: function addEmptyColorSection() {
+      this.palette.color.push(this.getEmptyColorSection());
+    },
+
+    AddColorToSection: function AddColorToSection(section) {
+      section.child.push({ name: '#000' });
+    },
+    savePalette: function savePalette() {
+      this.$http.put('/user/' + this.user + '/moodboard/' + this.moodboard + '/category/' + this.category, this.palette).then(function (response) {}, function (response) {
+        console.log(response);
+      });
+    },
+
+    getSettings: function getSettings() {
+      var _this2 = this;
+
+      this.$http.get('/user/' + this.user + '/moodboard/' + this.moodboard + '/category/' + this.category, this.palette).then(function (response) {
+
+        if (response['data']) {
+          _this2.$set('palette', response['data']);
+        }
+      }, function (response) {
+        console.log(response);
+      });
+    }
+  }
+
+});
+
+},{}],7:[function(require,module,exports){
+'use strict';
+
+require('./ColorPalette');
+require('./Typography');
+
+},{"./ColorPalette":5,"./Typography":6}]},{},[4]);
 
 //# sourceMappingURL=app.js.map
